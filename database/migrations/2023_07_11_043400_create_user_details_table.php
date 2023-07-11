@@ -13,10 +13,11 @@ return new class extends Migration
     {
         Schema::create('user_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('username')->references('username')->on('users');
+            $table->string('username');
             $table->string('gender');
             $table->string('phone_number')->unique();
             $table->boolean('agreement');
+            $table->foreign('username')->references('username')->on('users');
             $table->timestamps();
         });
     }
