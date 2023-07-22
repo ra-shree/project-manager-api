@@ -22,10 +22,5 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin'
             ]);
          User::factory(10)->create();
-         Project::factory(10)->create();
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
     }
 }

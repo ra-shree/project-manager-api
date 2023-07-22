@@ -17,6 +17,7 @@ class ProjectFactory extends Factory
      */
     public function definition(): array
     {
+<<<<<<< HEAD
         $manager = User::where('role', 'manager')->inRandomOrder()->first();
         $statuses = ['In Progress', 'Completed', 'Draft', 'On Hold'];
         return [
@@ -24,6 +25,11 @@ class ProjectFactory extends Factory
             'description' => fake()->text(300),
             'manager_id' => $manager->id,
             'status' => fake()->randomElement($statuses),
+=======
+        return [
+            'name' => fake()->sentence('3', false),
+            'owner_id' => User::class,
+>>>>>>> 6d6431f97a949d2530fbb7b3789e4dfb91324ccf
         ];
     }
 }

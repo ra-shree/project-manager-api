@@ -14,10 +14,15 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+<<<<<<< HEAD
             $table->text('description');
             $table->string('status');
             $table->unsignedBigInteger('manager_id');
             $table->foreign('manager_id')->references('id')->on('users');
+=======
+            $table->unsignedBigInteger('owner_id');
+            $table->foreign('owner_id')->references('id')->on('users');
+>>>>>>> 6d6431f97a949d2530fbb7b3789e4dfb91324ccf
             $table->timestamps();
         });
     }
