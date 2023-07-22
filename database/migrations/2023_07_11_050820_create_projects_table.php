@@ -13,8 +13,11 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('owner_id');
-            $table->foreign('owner_id')->references('id')->on('users');
+            $table->string('name');
+            $table->text('description');
+            $table->string('status');
+            $table->unsignedBigInteger('manager_id');
+            $table->foreign('manager_id')->references('id')->on('users');
             $table->timestamps();
         });
     }

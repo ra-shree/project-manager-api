@@ -5,7 +5,6 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -20,10 +19,11 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
-        'username',
+        'role'
     ];
 
     /**
@@ -46,14 +46,9 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function userDetail(): HasOne
-    {
-        return $this->hasOne(UserDetail::class, 'username', 'username');
-    }
-
     public function projects(): HasMany
     {
-        return $this->hasMany(Project::class, 'owner_id');
+        return $this->hasMany(Project::class, 'manager_id');
     }
 
     public function tasks(): HasMany
