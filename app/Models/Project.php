@@ -16,7 +16,7 @@ class Project extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'owner_id');
+        return $this->belongsTo(User::class, 'manager_id');
     }
 
     public function projectMembers(): HasManyThrough
