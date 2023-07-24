@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Nette\Utils\Random;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\UserDetail>
@@ -22,8 +23,8 @@ class UserDetailFactory extends Factory
         return [
             'username' => User::factory(),
             'phone_number' => fake()->phoneNumber(),
-            'gender' => 'male',
-            'agreement' => true,
+            'gender' => fake()->randomElement(['male', 'female', 'other']),
+            'agreement' => fake()->randomElement([true, false]),
         ];
     }
 }
