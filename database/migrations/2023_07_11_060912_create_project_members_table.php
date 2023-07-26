@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('project_members', function (Blueprint $table) {
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('user_id');
-            $table->unique('project_id', 'user_id');
+            $table->primary(['project_id', 'user_id']);
             $table->foreign('project_id')->references('id')->on('projects');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
