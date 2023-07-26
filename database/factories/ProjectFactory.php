@@ -21,8 +21,8 @@ class ProjectFactory extends Factory
         $manager = User::where('role', 'manager')->inRandomOrder()->first();
 
         return [
-            'title' => fake()->title(),
-            'description' => fake()->paragraph('5'),
+            'title' => fake()->sentence(8),
+            'description' => fake()->sentence(80),
             'status' => $status,
             'manager_id' => $manager,
         ];

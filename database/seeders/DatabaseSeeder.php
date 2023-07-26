@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Project;
+use App\Models\ProjectMember;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -21,8 +22,30 @@ class DatabaseSeeder extends Seeder
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
             'role' => 'admin'
         ]);
+
+        User::create([
+            'first_name' => 'manager',
+            'last_name' => 'manager',
+            'email' => 'manager@manager.com',
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+            'role' => 'manager'
+        ]);
+
+        User::create([
+            'first_name' => 'developer',
+            'last_name' => 'developer',
+            'email' => 'developer@developer.com',
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
+            'role' => 'developer'
+        ]);
         User::factory(20)->create();
         Project::factory(10)->create();
+
+
+        ProjectMember::factory(10)->create([
+            'project_id' => Project::factory(),
+            'user_id' => User::factory(),
+        ]);
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
