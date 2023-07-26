@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,7 +13,33 @@ class ProjectController extends Controller
 {
     public function index(): JsonResponse
     {
-        $projects = Project::with('user')->get();
+        $projects = Project::with('manager')->get();
+        if($projects) {
+            return response()->json($projects);
+        }
+        return response()->json();
+    }
+
+    public function findMembers(int $project_id): JsonResponse
+    {
+        $members = User::whereHas('projects', function ($query) use ($project_id) {
+            $query->where('project_id', $project_id);
+        })->get();
+        return response()->json($members);
+    }
+
+    public function show($project_id): JsonResponse | Response
+    {
+        $project = Project::with('members')->findOrFail($project_id);
+        if($project->manager_id == auth()->id()) {
+            return response()->json($project);
+        }
+       return response('Not Authorized', 401);
+    }
+
+    public function projectViaManager(): JsonResponse
+    {
+        $projects = Project::where('manager_id', '=', auth()->id())->get();
         return response()->json($projects);
     }
 
