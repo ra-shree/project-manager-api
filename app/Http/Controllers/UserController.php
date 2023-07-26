@@ -16,11 +16,11 @@ class UserController extends Controller
 
     public function findByRole(string $role): JsonResponse
     {
-        $projects = [];
+        $users = [];
         if($role == 'developer' || $role == 'manager') {
-            $projects = User::where('role', '=', $role)->get();
+            $users = User::where('role', '=', $role)->get();
         }
-        return response()->json($projects);
+        return response()->json($users);
     }
 
     public function find(int $id): JsonResponse
@@ -28,6 +28,7 @@ class UserController extends Controller
         $user = User::find($id)->with('projects')->get();
         return response()->json($user);
     }
+
     public function destroy(int $id): Response
     {
         $user = User::find($id);
