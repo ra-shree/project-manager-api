@@ -18,7 +18,7 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         $status = fake()->randomElement(['Completed', 'In Progress', 'Draft', 'On Hold']);
-        $manager = User::where('role', 'manager')->inRandomOrder()->first();
+        $manager = User::where('role', '=', 'manager')->inRandomOrder()->first();
 
         return [
             'title' => fake()->sentence(8),

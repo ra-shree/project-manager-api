@@ -18,13 +18,19 @@ class TaskFactory extends Factory
      */
     public function definition(): array
     {
+        $project = Project::select('id')->inRandomOrder()->first();
+        $projectId = $project->id;
+        $userInProject = User::where('role', '=', 'developer')
+            ->whereHas('projects', function ($query) use ($projectId) {
+                $query->where('project_id', '=' , $projectId);})
+            ->inRandomOrder()->first();
+
         return [
             'title' => fake()->sentence(5, false),
-            'description' => fake()->paragraph(2),
+            'description' => fake()->sentence(6),
             'completed' => fake()->randomElement([true, false]),
-            'assigned_to_id' => User::class,
-            'creator_id' => User::class,
-            'project_id' => Project::class,
+            'user_id' => $userInProject,
+            'project_id' => $projectId,
         ];
     }
 }

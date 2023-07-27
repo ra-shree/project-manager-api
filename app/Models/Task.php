@@ -18,18 +18,8 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function creator(): BelongsTo
+    public function assigned(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'creator_id');
-    }
-
-    public function assignedTo(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'assigned_to_id');
-    }
-
-    public function subTasks(): HasMany
-    {
-        return $this->hasMany(SubTask::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
