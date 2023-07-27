@@ -30,7 +30,7 @@ class ProjectController extends Controller
 
     public function show($project_id): JsonResponse | Response
     {
-        $project = Project::with('members')->findOrFail($project_id);
+        $project = Project::with('members')->find($project_id);
         if($project->manager_id == auth()->id()) {
             return response()->json($project);
         }

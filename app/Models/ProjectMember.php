@@ -2,21 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class ProjectMember extends Model
 {
     use HasFactory;
 
     protected $primaryKey = ['project_id', 'user_id'];
-    protected $fillable = [
-        'user_id',
-        'project_id',
-    ];
-    public $incrementing = false;
     protected $guarded = [];
+    public $incrementing = false;
 
+    protected function setKeysForSaveQuery($query): Builder
+    {
+        $query
+            ->where('project_id', '=', $this->getAttribute('project_id'))
+            ->where('user_id', '=', $this->getAttribute('user_id'));
+
+        return $query;
+    }
 }

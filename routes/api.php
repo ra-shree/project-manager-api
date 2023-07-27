@@ -41,11 +41,13 @@ Route::prefix('user')
     ->name('user.')
     ->middleware(['auth:sanctum'])
     ->group(function () {
+        Route::get('/users/{role}', [UserController::class, 'findByRole'])->name('users.developer');
         Route::get('/projects', [ProjectController::class, 'projectViaManager'])->name('manager.projects');
         Route::get('/projects/{project_id}', [ProjectController::class, 'show'])->name('project.show');
         Route::get('/projects/{project_id}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
         Route::get('/projects/{project_id}/add', [ProjectMemberController::class, 'getDeveloper'])->name('project.members.get');
         Route::post('/projects/{project_id}/add', [ProjectMemberController::class, 'addDeveloper'])->name('project.members.post');
+        Route::delete('/projects/{project_id}/remove/{user_id}', [ProjectMemberController::class, 'removeDeveloper'])->name('project.members.delete');
     });
 
 Route::middleware(['auth:sanctum'])
