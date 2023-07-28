@@ -4,6 +4,7 @@ use App\Http\Controllers\ApiAuthenticationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
+use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Http\Request;
@@ -48,6 +49,10 @@ Route::prefix('user')
         Route::get('/projects/{project_id}/add', [ProjectMemberController::class, 'getDeveloper'])->name('project.members.get');
         Route::post('/projects/{project_id}/add', [ProjectMemberController::class, 'addDeveloper'])->name('project.members.post');
         Route::delete('/projects/{project_id}/remove/{user_id}', [ProjectMemberController::class, 'removeDeveloper'])->name('project.members.delete');
+        Route::get('/tasks', [TaskController::class, 'index'])->name('task.index');
+        Route::post('/tasks', [TaskController::class, 'store'])->name('task.create');
+        Route::patch('/tasks/status/{task_id}', [TaskController::class, 'completed'])->name('task.completed');
+        Route::delete('/tasks/delete/{task_id}', [TaskController::class, 'destroy'])->name('task.delete');
     });
 
 Route::middleware(['auth:sanctum'])
@@ -71,3 +76,4 @@ Route::post('/login', [ApiAuthenticationController::class, 'store']);
 //Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
 
 //Route::get('/users', [UserController::class, 'index'])->name('users');
+//Route::delete('/tasks/delete/${task_id}', [TaskController::class, 'destroy'])->name('task.delete');
