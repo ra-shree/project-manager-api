@@ -20,21 +20,20 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-//Route::middleware(['auth:sanctum'])->prefix('admin')->name('admin.')->group(function () {
-//
-//});
 
 Route::prefix('admin')
     ->name('admin.')
-    ->middleware(['auth:sanctum'])
+    ->middleware(['auth:sanctum', 'admin'])
     ->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users');
         Route::post('/users/create',[RegisteredUserController::class, 'store'])->name('users.create');
-        Route::delete('/users/delete/{id}', [UserController::class, 'destroy'])->name('users.delete');
-        Route::get('/users/{role}', [UserController::class, 'findByRole'])->name('users.role');
+        Route::put('/users/update/{user_id}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('/users/delete/{user_id}', [UserController::class, 'destroy'])->name('users.delete');
+        Route::get('/users/{user_role}', [UserController::class, 'findByRole'])->name('users.role');
         Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
         Route::post('/projects/create', [ProjectController::class, 'store'])->name('projects.create');
-        Route::delete('/projects/delete/{id}', [ProjectController::class, 'destroy'])->name('projects.delete');
+        Route::put('/projects/update/{project_id}', [ProjectController::class, 'update'])->name('projects.update');
+        Route::delete('/projects/delete/{project_id}', [ProjectController::class, 'destroy'])->name('projects.delete');
     });
 
 
@@ -43,14 +42,16 @@ Route::prefix('user')
     ->middleware(['auth:sanctum'])
     ->group(function () {
         Route::get('/users/{role}', [UserController::class, 'findByRole'])->name('users.developer');
-        Route::get('/projects', [ProjectController::class, 'projectViaManager'])->name('manager.projects');
+        Route::get('/projects', [ProjectController::class, 'projectViaRole'])->name('manager.projects');
         Route::get('/projects/{project_id}', [ProjectController::class, 'show'])->name('project.show');
+        Route::patch('/projects/status/{project_id}', [ProjectController::class, 'updateStatus'])->name('project.update');
         Route::get('/projects/{project_id}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
         Route::get('/projects/{project_id}/add', [ProjectMemberController::class, 'getDeveloper'])->name('project.members.get');
         Route::post('/projects/{project_id}/add', [ProjectMemberController::class, 'addDeveloper'])->name('project.members.post');
         Route::delete('/projects/{project_id}/remove/{user_id}', [ProjectMemberController::class, 'removeDeveloper'])->name('project.members.delete');
         Route::get('/tasks', [TaskController::class, 'index'])->name('task.index');
         Route::post('/tasks', [TaskController::class, 'store'])->name('task.create');
+        Route::put('/tasks/update/{task_id}', [TaskController::class, 'update'])->name('task.update');
         Route::patch('/tasks/status/{task_id}', [TaskController::class, 'completed'])->name('task.completed');
         Route::delete('/tasks/delete/{task_id}', [TaskController::class, 'destroy'])->name('task.delete');
     });
@@ -68,12 +69,3 @@ Route::middleware(['auth:sanctum'])->group(function() {
 });
 
 Route::post('/login', [ApiAuthenticationController::class, 'store']);
-
-//Route::get('/projects/{project_id}/add', [ProjectMemberController::class, 'getDeveloper'])->name('project.members.get');
-//Route::get('/users/{role}', [UserController::class, 'findByRole'])->name('users.role');
-
-//Route::get('/projects/{project_id}', [ProjectController::class, 'show'])->name('project.show');
-//Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
-
-//Route::get('/users', [UserController::class, 'index'])->name('users');
-//Route::delete('/tasks/delete/${task_id}', [TaskController::class, 'destroy'])->name('task.delete');
