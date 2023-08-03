@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -30,7 +31,7 @@ class ApiAuthenticationController extends Controller
         return response()->json(['message'=> 'Authenticated', 'token' => $token]);
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request): Response
     {
         $request->user()->currentAccessToken()->delete();
         return response('User Logged out', 200);
