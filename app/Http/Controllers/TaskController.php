@@ -13,9 +13,14 @@ class TaskController extends Controller
 {
     public function index(): JsonResponse
     {
-        $user_id = auth()->id();
-        $projects = Project::where('manager_id', '=', $user_id)->pluck('id');
-        $tasks = Task::with('assigned')->whereIn('project_id', $projects)->get();
+        $user = auth()->user();
+        if($user->role == 'manager') {
+            $projects = Project::where('manager_id', '=', $user->id)->pluck('id');
+            $tasks = Task::with('assigned')->whereIn('project_id', $projects)->get();
+        }
+        if($user->role == 'developer') {
+            $tasks = Task::with('assigned')->where('user_id', '=', $user->id)->get();
+        }
         return response()->json($tasks);
     }
 

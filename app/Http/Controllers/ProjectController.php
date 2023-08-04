@@ -43,18 +43,18 @@ class ProjectController extends Controller
     public function updateStatus(Request $request, int $project_id): JsonResponse | Response
     {
         $request->validate([
-            'status' => ['required', 'string'],
+            'status' => ['required', Rule::in(['Draft', 'In Progress', 'Completed', 'On Hold'])],
         ]);
 
         $project = Project::find($project_id);
         if($project) {
-            $project->update([
-                'status' => $request->status,
-            ]);
-            return response()->json(['status' => $request->status]);
+            $project->status = $request->status;
+            $project->save();
+            return response()->json(['status' => $project->status]);
         }
         return response('Project does not exist', 401);
     }
+
     public function projectViaRole(): JsonResponse
     {
         if(auth()->user()->role == 'manager') {
@@ -75,13 +75,14 @@ class ProjectController extends Controller
             'title' => ['required', 'string', 'max:255', 'min:3'],
             'description' => ['string', 'max:500'],
             'manager_id' => ['integer', Rule::exists('users', 'id')],
+            'status' => ['required', 'string', Rule::in(['Draft', 'In Progress', 'Completed', 'On Hold'])]
         ]);
 
         Project::create([
             'title' => $request->title,
             'description' => ($request->description)? $request->description : '',
-            'status' => 'Draft',
             'manager_id' => ($request->manager_id)? $request->manager_id : '',
+            'status' => $request->status,
         ]);
 
         return response('Project Created', 200);
@@ -93,6 +94,7 @@ class ProjectController extends Controller
             'title' => ['required', 'string', 'max:255', 'min:3'],
             'description' => ['string', 'max:500'],
             'manager_id' => ['integer', Rule::exists('users', 'id')],
+            'status' => ['required', 'string', Rule::in(['Draft', 'In Progress', 'Completed', 'On Hold'])]
         ]);
 
         $project = Project::find($project_id);
@@ -100,6 +102,7 @@ class ProjectController extends Controller
             $project->title = $request->title;
             $project->description = $request->description;
             $project->manager_id = $request->manager_id;
+            $project->status = $request->status;
             $project->save();
             return response('Project Updated', 200);
         }
