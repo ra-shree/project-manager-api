@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('status');
             $table->unsignedBigInteger('manager_id');
-            $table->foreign('manager_id')->references('id')->on('users');
+            $table->foreign('manager_id')->references('id')->on('users')->onDelete('set null');
             $table->timestamps();
         });
     }
