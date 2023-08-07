@@ -14,6 +14,7 @@ class ApiAuthenticationController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
+        $request->merge(['email' => strtolower($request->email)]);
         $request->validate([
             'email' => ['required', 'email', Rule::exists('users', 'email')],
             'password' => ['required', 'min:8'],

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,6 +45,14 @@ class User extends \Illuminate\Foundation\Auth\User
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value): string => strtolower($value),
+            set: fn (string $value): string => strtolower($value),
+        );
+    }
 
     public function projects(): BelongsToMany
     {
