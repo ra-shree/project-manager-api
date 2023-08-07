@@ -80,9 +80,14 @@ class AggregateController extends Controller
             $query->where('manager_id', auth()->id());
         })->where('role', '=', 'developer')->count();
 
+        $completed_task_count = Task::whereHas('project', function ($query) {
+            $query->where('manager_id', auth()->id());
+        })->where('completed', '=', true )->whereDate('updated_at', today())->count();
+
         return response()->json([
             'project_count' => $project_count,
             'developer_count' => $developer_count,
+            'completed_task_count' => $completed_task_count,
         ]);
     }
 
