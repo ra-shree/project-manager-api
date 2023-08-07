@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AggregateController;
 use App\Http\Controllers\ApiAuthenticationController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ProjectController;
@@ -34,6 +35,9 @@ Route::prefix('admin')
         Route::post('/projects/create', [ProjectController::class, 'store'])->name('projects.create');
         Route::put('/projects/update/{project_id}', [ProjectController::class, 'update'])->name('projects.update');
         Route::delete('/projects/delete/{project_id}', [ProjectController::class, 'destroy'])->name('projects.delete');
+        Route::get('/summary/count', [AggregateController::class, 'summary'])->name('summary.count');
+        Route::get('/summary/project/{keyword}', [AggregateController::class, 'project'])->name('summary.project');
+        Route::get('/summary/task/{keyword}', [AggregateController::class, 'tasks'])->name('summary.tasks');
     });
 
 
@@ -54,6 +58,9 @@ Route::prefix('user')
         Route::put('/tasks/update/{task_id}', [TaskController::class, 'update'])->name('task.update');
         Route::patch('/tasks/status/{task_id}', [TaskController::class, 'completed'])->name('task.completed');
         Route::delete('/tasks/delete/{task_id}', [TaskController::class, 'destroy'])->name('task.delete');
+        Route::get('/summary/count', [AggregateController::class, 'userSummary'])->name('summary.count');
+        Route::get('/summary/projects', [AggregateController::class, 'userProjects'])->name('summary.projects');
+        Route::get('/summary/tasks', [AggregateController::class, 'userTasks'])->name('summary.tasks');
     });
 
 Route::middleware(['auth:sanctum'])

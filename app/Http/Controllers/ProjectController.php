@@ -31,7 +31,7 @@ class ProjectController extends Controller
     public function show($project_id): JsonResponse | Response
     {
         $project = Project::with('members')->find($project_id);
-        if($project->manager_id == auth()->id()) {
+        if($project->manager_id == auth()->id() || auth()->user()->role == 'admin') {
             return response()->json($project);
         }
         if($project->members->contains(auth()->id())) {
