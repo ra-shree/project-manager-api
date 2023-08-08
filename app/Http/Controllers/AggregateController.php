@@ -64,10 +64,10 @@ class AggregateController extends Controller
     {
         if(auth()->user()->role === 'developer') {
             $completed_task_count = Task::where('completed', '=', true )
-                ->where('id', '=', auth()->id())
+                ->where('user_id', '=', auth()->id())
                 ->count();
             $incomplete_task_count = Task::where('completed', '=', false )
-                ->where('id', '=', auth()->id())
+                ->where('user_id', '=', auth()->id())
                 ->count();
             return response()->json([
                 'completed_task_count' => $completed_task_count,
