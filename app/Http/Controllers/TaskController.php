@@ -13,14 +13,12 @@ class TaskController extends Controller
 {
     public function index(): JsonResponse
     {
-        $user = auth()->user();
-        if($user->role == 'manager') {
-            $projects = Project::where('manager_id', '=', $user->id)->pluck('id');
+        if(auth()->user()->role == 'manager') {
+            $projects = Project::where('manager_id', '=', auth()->id())->pluck('id');
             $tasks = Task::with('assigned')->whereIn('project_id', $projects)->get();
+            return response()->json($tasks);
         }
-        if($user->role == 'developer') {
-            $tasks = Task::with('assigned')->where('user_id', '=', $user->id)->get();
-        }
+        $tasks = Task::with('assigned')->where('user_id', '=', auth()->id())->get();
         return response()->json($tasks);
     }
 
@@ -64,7 +62,8 @@ class TaskController extends Controller
         return response('Task does not exist', 401);
     }
 
-    public function completed(Request $request, int $task_id): JsonResponse
+    // changed
+    public function completed(int $task_id): JsonResponse
     {
         $task = Task::where('id', '=', $task_id)->first();
         $task->completed = !$task->completed;

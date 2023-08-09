@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     public function index(): JsonResponse
     {
-        $user =  User::where('id', '<>', '1')->orderByDesc('created_at')->get();
+        $user =  User::where('id', '!=', '1')->orderByDesc('created_at')->get();
         return response()->json($user);
     }
 

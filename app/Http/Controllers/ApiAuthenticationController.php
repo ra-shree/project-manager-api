@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 
 class ApiAuthenticationController extends Controller
@@ -17,7 +18,7 @@ class ApiAuthenticationController extends Controller
         $request->merge(['email' => strtolower($request->email)]);
         $request->validate([
             'email' => ['required', 'email', Rule::exists('users', 'email')],
-            'password' => ['required', 'min:8'],
+            'password' => ['required', 'min:8', 'max:255', Rules\Password::defaults()],
         ]);
 
         $user = User::where('email', $request->email)->first();

@@ -23,7 +23,7 @@ class RegisteredUserController extends Controller
             'first_name' => ['required', 'string', 'max:255', 'min:3'],
             'last_name' => ['required', 'string', 'max:255', 'min:3'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => ['required', 'confirmed', 'max:255', Rules\Password::defaults()],
             'role' => ['required', Rule::in(['developer', 'manager'])],
         ]);
 
