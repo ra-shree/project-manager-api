@@ -20,13 +20,6 @@ class ProjectMemberController extends Controller
             ->get();
         return response()->json($usersNotInProject);
     }
-//    public function getNonMembers(int $project_id)
-//    {
-//        $usersNotInProject = User::whereDoesntHave('projects', function ($query) use ($project_id) {
-//            $query->where('project_id', $project_id);
-//        })->get();
-//        return response()->json($usersNotInProject);
-//    }
 
     public function addDeveloper(Request $request): Response
     {
