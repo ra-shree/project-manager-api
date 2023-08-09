@@ -61,11 +61,11 @@ class ProjectController extends Controller
             $projects = Project::where('manager_id', '=', auth()->id())->get();
             return response()->json($projects);
         }
-        if (auth()->user()->role == 'developer') {
-            $projects = Project::whereHas('members', function ($query) {
-                $query->where('user_id', auth()->id());
-            })->get();
-        }
+
+        $projects = Project::whereHas('members', function ($query) {
+            $query->where('user_id', auth()->id());
+        })->get();
+
         return response()->json($projects);
     }
 
@@ -74,7 +74,7 @@ class ProjectController extends Controller
         $request->validate([
             'title' => ['required', 'string', 'max:255', 'min:3'],
             'description' => ['string', 'max:500'],
-            'manager_id' => ['integer', Rule::exists('users', 'id')],
+            'manager_id' => ['integer', 'required', Rule::exists('users', 'id')],
             'status' => ['required', 'string', Rule::in(['Draft', 'In Progress', 'Completed', 'On Hold'])]
         ]);
 

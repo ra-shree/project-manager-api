@@ -7,20 +7,37 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class AggregateController extends Controller
 {
     public function summary(): JsonResponse
     {
-        $developer_count = User::where('role', '=','developer')->count();
-        $manager_count = User::where('role', '=','manager')->count();
-        $completed_project_count = Project::where('status', '=', 'Completed')->count();
-        $ongoing_project_count = Project::where('status', '=', 'In Progress')->count();
-        $completed_task_count = Task::where('completed', '=', true )->count();
-        $incomplete_task_count = Task::where('completed', '=', false )->count();
+        $user_count_query = User::select('role', DB::raw('COUNT(*) as count'))->groupBy('role')->get();
+        $user_count = $user_count_query->reduce(function($prev, $user) {
+            return [
+                ...collect($prev)->toArray(),
+                data_get($user, 'role', 'others').'s' => data_get($user, 'count', 0)
+            ];
+        }, []);
+
+        $project_count_query = Project::select('status', DB::raw('COUNT(*) as count'))->groupBy('status')->get();
+        $project_count = $project_count_query->reduce(function($prev, $project) {
+            return [
+                ...collect($prev)->toArray(),
+                data_get($project, 'status', 'others') => data_get($project, 'count', 0)
+            ];
+        }, []);
+
+        $completed_project_count = $project_count['Completed']?? 0;
+        $ongoing_project_count = $project_count['In Progress']?? 0;
+
+        $task_count = Task::select('completed', DB::raw('COUNT(*) as count'))->groupBy('completed')->get()->toArray();
+        $completed_task_count = data_get($task_count, '0.count', 0);
+        $incomplete_task_count = data_get($task_count, '1.count', 0);
+
         return response()->json([
-            'developer_count' => $developer_count,
-            'manager_count' => $manager_count,
+            ...$user_count,
             'ongoing_project_count' => $ongoing_project_count,
             'completed_project_count' => $completed_project_count,
             'completed_task_count' => $completed_task_count,
@@ -63,12 +80,20 @@ class AggregateController extends Controller
     public function userSummary(): JsonResponse
     {
         if(auth()->user()->role === 'developer') {
-            $completed_task_count = Task::where('completed', '=', true )
+            $task_count_query = Task::select('completed', DB::raw('COUNT(*) as count'))
                 ->where('user_id', '=', auth()->id())
-                ->count();
-            $incomplete_task_count = Task::where('completed', '=', false )
-                ->where('user_id', '=', auth()->id())
-                ->count();
+                ->groupBy('completed')->get();
+
+            $task_count = $task_count_query->reduce(function($prev, $task) {
+                return [
+                    ...collect($prev)->toArray(),
+                    data_get($task, 'completed', 'others') => data_get($task, 'count', 0)
+                ];
+            }, []);
+
+            $completed_task_count = $task_count[1]?? 0;
+            $incomplete_task_count = $task_count[0]?? 0;
+
             return response()->json([
                 'completed_task_count' => $completed_task_count,
                 'incomplete_task_count' => $incomplete_task_count,
