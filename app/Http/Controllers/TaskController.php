@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TaskRequest;
 use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\JsonResponse;
@@ -22,53 +23,31 @@ class TaskController extends Controller
         return response()->json($tasks);
     }
 
-    public function store(Request $request): Response | JsonResponse
+    public function store(TaskRequest $request): Response | JsonResponse
     {
-        $request->validate([
-            'title' => ['required', 'string', 'max:255', 'min:3'],
-            'description' => ['nullable', 'max:150'],
-            'project_id' => ['required', Rule::exists('projects', 'id')],
-            'user_id' => ['required', Rule::exists('users', 'id')],
-        ]);
-
-        Task::create([
-            'title' => $request->title,
-            'description' => ($request->description)? $request->description : '',
-            'project_id' => $request->project_id,
-            'user_id' => $request->user_id,
-        ]);
-
+        Task::create($request->validated());
         return response('Task Created', 200);
     }
 
-    public function update(Request $request, int $task_id): Response
+    public function update(TaskRequest $request, int $task_id): Response
     {
-        $request->validate([
-            'title' => ['required', 'string', 'max:255', 'min:3'],
-            'description' => ['nullable', 'max:500'],
-            'project_id' => ['required', Rule::exists('projects', 'id')],
-            'user_id' => ['required', Rule::exists('users', 'id')],
-        ]);
-
         $task = Task::find($task_id);
         if($task) {
-            $task->title = $request->title;
-            $task->description = ($request->description)? $request->description : '';
-            $task->project_id = $request->project_id;
-            $task->user_id = $request->user_id;
-            $task->save();
+            $task->update($request->validated());
             return response('Task Updated', 200);
         }
         return response('Task does not exist', 401);
     }
 
-    // changed
-    public function completed(int $task_id): JsonResponse
+    public function completed(int $task_id): JsonResponse | Response
     {
         $task = Task::where('id', '=', $task_id)->first();
-        $task->completed = !$task->completed;
-        $task->save();
-        return response()->json($task);
+        if($task) {
+            $task->completed = !$task->completed;
+            $task->save();
+            return response()->json($task);
+        }
+        return response('Task does not exist', 401);
     }
 
     public function destroy(int $task_id): Response
