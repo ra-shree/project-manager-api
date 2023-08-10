@@ -13,7 +13,12 @@ class Project extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'title',
+        'description',
+        'status',
+        'manager_id',
+    ];
 
     public function manager(): BelongsTo
     {

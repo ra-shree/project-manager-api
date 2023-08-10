@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -40,16 +41,11 @@ class ProjectController extends Controller
        return response('Not Authorized', 401);
     }
 
-    public function updateStatus(Request $request, int $project_id): JsonResponse | Response
+    public function updateStatus(ProjectRequest $request, int $project_id): JsonResponse | Response
     {
-        $request->validate([
-            'status' => ['required', Rule::in(['Draft', 'In Progress', 'Completed', 'On Hold'])],
-        ]);
-
         $project = Project::find($project_id);
         if($project) {
-            $project->status = $request->status;
-            $project->save();
+            $project->update($request->validated());
             return response()->json(['status' => $project->status]);
         }
         return response('Project does not exist', 401);
@@ -69,41 +65,17 @@ class ProjectController extends Controller
         return response()->json($projects);
     }
 
-    public function store(Request $request): Response
+    public function store(ProjectRequest $request): Response
     {
-        $request->validate([
-            'title' => ['required', 'string', 'max:255', 'min:3'],
-            'description' => ['string', 'max:500'],
-            'manager_id' => ['integer', 'required', Rule::exists('users', 'id')],
-            'status' => ['required', 'string', Rule::in(['Draft', 'In Progress', 'Completed', 'On Hold'])]
-        ]);
-
-        Project::create([
-            'title' => $request->title,
-            'description' => ($request->description)? $request->description : '',
-            'manager_id' => ($request->manager_id)? $request->manager_id : '',
-            'status' => $request->status,
-        ]);
-
+        Project::create($request->validated());
         return response('Project Created', 200);
     }
 
-    public function update(Request $request, int $project_id): Response
+    public function update(ProjectRequest $request, int $project_id): Response
     {
-        $request->validate([
-            'title' => ['required', 'string', 'max:255', 'min:3'],
-            'description' => ['string', 'max:500'],
-            'manager_id' => ['integer', Rule::exists('users', 'id')],
-            'status' => ['required', 'string', Rule::in(['Draft', 'In Progress', 'Completed', 'On Hold'])]
-        ]);
-
         $project = Project::find($project_id);
         if($project) {
-            $project->title = $request->title;
-            $project->description = $request->description;
-            $project->manager_id = $request->manager_id;
-            $project->status = $request->status;
-            $project->save();
+            $project->update($request->validated());
             return response('Project Updated', 200);
         }
         return response('Project does not exist', 401);
