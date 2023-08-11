@@ -4,90 +4,82 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
 use App\Models\Project;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(): JsonResponse
     {
-        $projects = Project::with('manager')->orderByDesc('updated_at')->get();
-        if($projects) {
+//        display all projects if admin
+        if(auth()->user()->role === 'admin') {
+            $projects = Project::with('manager')->orderByDesc('updated_at')->get();
             return response()->json($projects);
         }
-        return response()->json();
-    }
 
-    public function findMembers(int $project_id): JsonResponse
-    {
-        $members = User::whereHas('projects', function ($query) use ($project_id) {
-            $query->where('project_id', $project_id);
-        })->get();
-        return response()->json($members);
-    }
-
-    public function show($project_id): JsonResponse | Response
-    {
-        $project = Project::with('members', 'tasks', 'tasks.assigned')->find($project_id);
-        if($project->manager_id == auth()->id() || auth()->user()->role == 'admin') {
-            return response()->json($project);
-        }
-        if($project->members->contains(auth()->id())) {
-            return response()->json($project);
-        }
-       return response('Not Authorized', 401);
-    }
-
-    public function updateStatus(ProjectRequest $request, int $project_id): JsonResponse | Response
-    {
-        $project = Project::find($project_id);
-        if($project) {
-            $project->update($request->validated());
-            return response()->json(['status' => $project->status]);
-        }
-        return response('Project does not exist', 401);
-    }
-
-    public function projectViaRole(): JsonResponse
-    {
-        if(auth()->user()->role == 'manager') {
+//        display projects that are assigned to the manager
+        if(auth()->user()->role === 'manager') {
             $projects = Project::where('manager_id', '=', auth()->id())->get();
             return response()->json($projects);
         }
 
+//        display projects that has the developer as a member
         $projects = Project::whereHas('members', function ($query) {
-            $query->where('user_id', auth()->id());
+            $query->where('user_id', '=', auth()->id());
         })->get();
 
         return response()->json($projects);
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(ProjectRequest $request): Response
     {
         Project::create($request->validated());
         return response('Project Created', 200);
     }
 
-    public function update(ProjectRequest $request, int $project_id): Response
+    /**
+     * Display the specified resource.
+     */
+    public function show(Project $project): JsonResponse
     {
-        $project = Project::find($project_id);
-        if($project) {
-            $project->update($request->validated());
-            return response('Project Updated', 200);
-        }
-        return response('Project does not exist', 401);
+        $project = $project->load('members', 'tasks', 'tasks.assigned');
+        return response()->json($project);
     }
 
-    public function destroy(int $project_id): Response
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(ProjectRequest $request, Project $project): JsonResponse | Response
     {
-        $project = Project::find($project_id);
-        if($project) {
-            $project->delete();
-            return response('Project Deleted', 200);
+        $project->update($request->validated());
+        if ($request->isMethod('PATCH')) {
+            return response()->json(['status' => $project->status]);
         }
-        return response('Project does not exist', 401);
+        return response('Project Updated', 200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Project $project)
+    {
+        $project->delete();
+        return response('Project Deleted', 200);
+    }
+
+    /**
+     * Display all the members of a project
+     */
+    public function findMembers(Project $project): JsonResponse
+    {
+        $members = $project->members;
+        return response()->json($members);
     }
 }

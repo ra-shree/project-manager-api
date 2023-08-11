@@ -4,49 +4,63 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(): JsonResponse
     {
-        $user =  User::where('id', '!=', '1')->orderByDesc('created_at')->get();
+        $user =  User::where('id', '!=', 1)->orderByDesc('created_at')->get();
         return response()->json($user);
     }
 
-    public function findByRole(string $user_role): JsonResponse
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(UserRequest $request): Response
     {
-        $users = [];
-        if($user_role == 'developer' || $user_role == 'manager') {
-            $users = User::where('role', '=', $user_role)->get();
-        }
-        return response()->json($users);
+        $user = User::create($request->validated());
+        event(new Registered($user));
+        return response('User Created', 201);
     }
 
-    public function find(int $user_id): JsonResponse
+    /**
+     * Display the specified resource.
+     */
+    public function show(User $user): JsonResponse
     {
-        $user = User::find($user_id)->with('projects')->get();
         return response()->json($user);
     }
 
-    public function update(UserRequest $request, int $user_id): Response
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UserRequest $request, User $user): Response
     {
-        $user = User::find($user_id);
-        if($user) {
-            $user->update($request->validated());
-            return response('User Updated', 200);
-        }
-        return response('User does not exist', 401);
+        $user->update($request->validated());
+        return response('User Updated', 200);
     }
 
-    public function destroy(int $user_id): Response
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(User $user): Response
     {
-        $user = User::find($user_id);
-        if($user) {
-            $user->delete();
-            return response('User Deleted', 200);
-        }
-        return response('User does not exist', 401);
+        $user->delete();
+        return response('User Deleted', 200);
+    }
+
+    /**
+     * Display a listing of managers
+     */
+    public function indexManager(): JsonResponse
+    {
+        $managers = User::where('role', '=', 'manager')->get();
+        return response()->json($managers);
     }
 }

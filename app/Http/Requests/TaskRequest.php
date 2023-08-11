@@ -22,11 +22,23 @@ class TaskRequest extends FormRequest
      */
     public function rules(): array
     {
+        return $this->isMethod('PATCH')? $this->patch() : $this->store();
+    }
+
+    protected function store(): array
+    {
         return [
             'title' => ['required', 'string', 'max:255', 'min:3'],
             'description' => ['nullable', 'max:150'],
             'project_id' => ['required', Rule::exists('projects', 'id')],
             'user_id' => ['required', Rule::exists('users', 'id')],
+        ];
+    }
+
+    protected function patch(): array
+    {
+        return [
+            'completed' => ['required', Rule::in('true', 'false')],
         ];
     }
 }

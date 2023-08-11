@@ -2,14 +2,14 @@
 
 use App\Http\Controllers\AggregateController;
 use App\Http\Controllers\ApiAuthenticationController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Controllers\ProjectController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+//use App\Http\Controllers\RegularControllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,51 +22,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::prefix('admin')
-    ->name('admin.')
-    ->middleware(['auth:sanctum', 'admin'])
-    ->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('users');
-        Route::post('/users/create',[RegisteredUserController::class, 'store'])->name('users.create');
-        Route::put('/users/update/{user_id}', [UserController::class, 'update'])->name('users.update');
-        Route::delete('/users/delete/{user_id}', [UserController::class, 'destroy'])->name('users.delete');
-        Route::get('/users/{user_role}', [UserController::class, 'findByRole'])->name('users.role');
-        Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
-        Route::post('/projects/create', [ProjectController::class, 'store'])->name('projects.create');
-        Route::put('/projects/update/{project_id}', [ProjectController::class, 'update'])->name('projects.update');
-        Route::delete('/projects/delete/{project_id}', [ProjectController::class, 'destroy'])->name('projects.delete');
-        Route::get('/summary/count', [AggregateController::class, 'summary'])->name('summary.count');
-        Route::get('/summary/project/{keyword}', [AggregateController::class, 'project'])->name('summary.project');
-        Route::get('/summary/task/{keyword}', [AggregateController::class, 'tasks'])->name('summary.tasks');
-    });
+Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'admin'], 'as' => 'admin.'], function () {
+    Route::get('/users/managers', [UserController::class, 'indexManager'])->name('users.managers');
+    Route::get('/projects/{project}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
+    Route::get('/summary/count', [AggregateController::class, 'summary'])->name('summary.count');
+    Route::get('/summary/project/{keyword}', [AggregateController::class, 'project'])->name('summary.project');
+    Route::get('/summary/task/{keyword}', [AggregateController::class, 'tasks'])->name('summary.tasks');
+    Route::apiResources([
+        'users' => UserController::class,
+        'projects' => ProjectController::class,
+        'tasks' => TaskController::class,
+    ]);
+    Route::apiResource('/members', ProjectMemberController::class)->except('show');
+});
 
-
-Route::prefix('user')
-    ->name('user.')
-    ->middleware(['auth:sanctum'])
-    ->group(function () {
-        Route::get('/users/{role}', [UserController::class, 'findByRole'])->name('users.developer');
-        Route::get('/projects', [ProjectController::class, 'projectViaRole'])->name('manager.projects');
-        Route::get('/projects/{project_id}', [ProjectController::class, 'show'])->name('project.show');
-        Route::patch('/projects/status/{project_id}', [ProjectController::class, 'updateStatus'])->name('project.update');
-        Route::get('/projects/{project_id}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
-        Route::get('/projects/{project_id}/add', [ProjectMemberController::class, 'getDeveloper'])->name('project.members.get');
-        Route::post('/projects/{project_id}/add', [ProjectMemberController::class, 'addDeveloper'])->name('project.members.post');
-        Route::delete('/projects/{project_id}/remove/{user_id}', [ProjectMemberController::class, 'removeDeveloper'])->name('project.members.delete');
-        Route::get('/tasks', [TaskController::class, 'index'])->name('task.index');
-        Route::post('/tasks', [TaskController::class, 'store'])->name('task.create');
-        Route::put('/tasks/update/{task_id}', [TaskController::class, 'update'])->name('task.update');
-        Route::patch('/tasks/status/{task_id}', [TaskController::class, 'completed'])->name('task.completed');
-        Route::delete('/tasks/delete/{task_id}', [TaskController::class, 'destroy'])->name('task.delete');
-        Route::get('/summary/count', [AggregateController::class, 'userSummary'])->name('summary.count');
-        Route::get('/summary/projects', [AggregateController::class, 'userProjects'])->name('summary.projects');
-        Route::get('/summary/tasks', [AggregateController::class, 'userTasks'])->name('summary.tasks');
-    });
-
-Route::middleware(['auth:sanctum'])
-    ->group(function () {
-        Route::post('/logout',[ApiAuthenticationController::class, 'destroy'])->name('logout');
-    });
+Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum'], 'as' => 'user.'], function () {
+    Route::get('/projects/{project}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
+    Route::get('/summary/count', [AggregateController::class, 'userSummary'])->name('summary.count');
+    Route::get('/summary/projects', [AggregateController::class, 'userProjects'])->name('summary.projects');
+    Route::get('/summary/tasks', [AggregateController::class, 'userTasks'])->name('summary.tasks');
+    Route::delete('/members/{project_id}/remove/{user_id}', [ProjectMemberController::class, 'removeDeveloper'])->name('members.remove');
+    Route::apiResource('/projects', ProjectController::class)->only('index', 'show', 'update');
+    Route::apiResources([
+        'tasks' => TaskController::class,
+        'members' => ProjectMemberController::class,
+    ]);
+});
 
 Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/user', function (Request $request) {
