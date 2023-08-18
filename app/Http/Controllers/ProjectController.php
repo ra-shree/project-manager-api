@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectRequest;
+use App\Http\Resources\ProjectCollection;
 use App\Models\Project;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -81,5 +82,20 @@ class ProjectController extends Controller
     {
         $members = $project->members;
         return response()->json($members);
+    }
+
+    public function paginateIndex(Request $request)
+    {
+        $size = $request->query('size') ?? 5;
+        $page = $request->query('page') ?? 1;
+        $search = $request->query('search');
+        if($request->query('search')) {
+            return new ProjectCollection(
+                Project::where('title', 'ilike', "%{$search}%")
+                ->orWhere('description', 'ilike', "%{$search}%")
+                ->limit($size)
+                ->offset(($page - 1) * $size)->get());
+        }
+        return new ProjectCollection(Project::limit($size)->offset(($page - 1) * $size)->get());
     }
 }
