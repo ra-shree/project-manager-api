@@ -6,6 +6,9 @@ use App\Http\Controllers\ProjectMemberController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Resources\ProjectCollection;
+use App\Http\Resources\ProjectResource;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -57,3 +60,4 @@ Route::middleware(['auth:sanctum'])->group(function() {
 });
 
 Route::post('/login', [ApiAuthenticationController::class, 'store']);
+Route::get('/projects', [ProjectController::class, 'paginateIndex']);
