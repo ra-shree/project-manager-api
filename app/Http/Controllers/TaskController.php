@@ -17,9 +17,8 @@ class TaskController extends Controller
     {
 //        Display all the tasks that belong to projects assigned to a manager
         if(auth()->user()->role === 'manager') {
-            $tasks = Task::with('assigned')->whereIn('project_id', function () {
-                return Project::select('id')->where('manager_id', '=', auth()->id())->get();
-            })->get();
+            $project_ids = Project::select('id')->where('manager_id', '=', auth()->id())->get()->pluck('id')->toArray();
+            $tasks = Task::with('assigned')->whereIn('project_id', $project_ids)->get();
             return response()->json($tasks);
         }
 //        Display tasks assigned to a developer
