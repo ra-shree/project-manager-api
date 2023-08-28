@@ -23,16 +23,34 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## Getting Started
 
-First, install the required packages:
+First, make a .env file using the command:
+
+```bash
+cp .env.example .env
+```
+
+Then, create the docker container using the docker-compose file:
+
+```bash
+docker compose up --build
+```
+
+Then, install the required packages:
 
 ```bash
 composer install
 ```
 
+Then, generate an app key and clear the cache:
+
+```bash
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan config:clear
+```
+
 Then, start the docker container:
 
 ```bash
-cd project-management-server
 ./vendor/bin/sail up
 ```
 
