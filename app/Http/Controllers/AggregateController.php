@@ -50,7 +50,7 @@ class AggregateController extends Controller
         if($keyword == 'new') {
             $projects = Project::with('manager')
                 ->orderBy('created_at', 'desc')
-                ->take(5)
+                ->take(4)
                 ->get();
             return response()->json($projects);
         }
@@ -58,7 +58,7 @@ class AggregateController extends Controller
         if($keyword == 'updated') {
             $projects = Project::with('manager')
                 ->orderBy('updated_at', 'desc')
-                ->take(5)
+                ->take(4)
                 ->get();
             return response()->json($projects);
         }

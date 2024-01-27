@@ -1,6 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/laravel,visualstudiocode,phpstorm+all
 # Edit at https://www.toptal.com/developers/gitignore?templates=laravel,visualstudiocode,phpstorm+all
 
+### Others ###
+.ddev/
+
 ### Laravel ###
 /vendor/
 node_modules/

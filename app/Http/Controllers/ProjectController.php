@@ -24,7 +24,7 @@ class ProjectController extends Controller
 
 //        display projects that are assigned to the manager
         if(auth()->user()->role === 'manager') {
-            $projects = Project::where('manager_id', '=', auth()->id())->get();
+            $projects = Project::with('manager')->where('manager_id', '=', auth()->id())->get();
             return response()->json($projects);
         }
 
