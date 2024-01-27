@@ -28,9 +28,9 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'admin'], 'as' => 'admin.'], function () {
     Route::get('/users/managers', [UserController::class, 'indexManager'])->name('users.managers');
     Route::get('/projects/{project}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
-    Route::get('/summary/count', [AggregateController::class, 'summary'])->name('summary.count');
-    Route::get('/summary/project/{keyword}', [AggregateController::class, 'project'])->name('summary.project');
-    Route::get('/summary/task/{keyword}', [AggregateController::class, 'tasks'])->name('summary.tasks');
+    Route::get('/summary/project', [AggregateController::class, 'project'])->name('summary.project');
+    Route::get('/summary/task', [AggregateController::class, 'tasks'])->name('summary.tasks');
+    Route::get('/summary', [AggregateController::class, 'summary'])->name('summary.count');
     Route::apiResources([
         'users' => UserController::class,
         'projects' => ProjectController::class,

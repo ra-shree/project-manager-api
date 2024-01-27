@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
@@ -45,29 +46,29 @@ class AggregateController extends Controller
         ]);
     }
 
-    public function project($keyword): JsonResponse | Response
+    public function project(Request $request): JsonResponse | Response
     {
-        if($keyword == 'new') {
-            $projects = Project::with('manager')
-                ->orderBy('created_at', 'desc')
-                ->take(4)
-                ->get();
+        $keyword = $request->query('project');
+
+        if($keyword === 'new') {
+            $projects = Project::orderBy('created_at', 'desc')->take(4)->get();
+
             return response()->json($projects);
         }
 
-        if($keyword == 'updated') {
-            $projects = Project::with('manager')
-                ->orderBy('updated_at', 'desc')
-                ->take(4)
-                ->get();
+        if($keyword === 'updated') {
+            $projects = Project::orderBy('updated_at', 'desc')->take(4)->get();
+
             return response()->json($projects);
         }
         return response()->noContent();
     }
 
-    public function tasks($keyword): JsonResponse | Response
+    public function tasks(Request $request): JsonResponse | Response
     {
-        if($keyword == 'new') {
+        $keyword = $request->get('task');
+
+        if($keyword === 'new') {
             $tasks = Task::with('assigned')
                 ->orderBy('created_at', 'desc')
                 ->take(5)
