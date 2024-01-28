@@ -6,6 +6,7 @@ use App\Http\Requests\UserRequest;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class UserController extends Controller
@@ -13,10 +14,17 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $user =  User::where('id', '!=', 1)->orderByDesc('created_at')->get();
-        return response()->json($user);
+        if ($request->has('role')) {
+            $role = $request->query('role');
+            $users = User::where('id', '!=', 1)->where('role', '=', $role)->get();
+
+            return response()->json($users);
+        }
+        $users =  User::where('id', '!=', 1)->orderByDesc('created_at')->get();
+
+        return response()->json($users);
     }
 
     /**
@@ -53,14 +61,5 @@ class UserController extends Controller
     {
         $user->delete();
         return response('User Deleted', 200);
-    }
-
-    /**
-     * Display a listing of managers
-     */
-    public function indexManager(): JsonResponse
-    {
-        $managers = User::where('role', '=', 'manager')->get();
-        return response()->json($managers);
     }
 }

@@ -26,11 +26,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'admin'], 'as' => 'admin.'], function () {
-    Route::get('/users/managers', [UserController::class, 'indexManager'])->name('users.managers');
     Route::get('/projects/{project}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
-    Route::get('/summary/project', [AggregateController::class, 'project'])->name('summary.project');
-    Route::get('/summary/task', [AggregateController::class, 'tasks'])->name('summary.tasks');
-    Route::get('/summary', [AggregateController::class, 'summary'])->name('summary.count');
+
+    Route::group(['prefix' => 'summary', 'as' => 'summary.'], function () {
+        Route::get('/project', [AggregateController::class, 'project'])->name('project');
+        Route::get('/task', [AggregateController::class, 'tasks'])->name('tasks');
+        Route::get('/', [AggregateController::class, 'summary'])->name('count');
+    });
+
     Route::apiResources([
         'users' => UserController::class,
         'projects' => ProjectController::class,
@@ -41,16 +44,22 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth:sanctum', 'admin'], 'a
 
 Route::group(['prefix' => 'user', 'middleware' => ['auth:sanctum'], 'as' => 'user.'], function () {
     Route::get('/projects/{project}/members', [ProjectController::class, 'findMembers'])->name('projects.members');
-    Route::get('/summary/count', [AggregateController::class, 'userSummary'])->name('summary.count');
-    Route::get('/summary/projects', [AggregateController::class, 'userProjects'])->name('summary.projects');
-    Route::get('/summary/tasks', [AggregateController::class, 'userTasks'])->name('summary.tasks');
+
+    Route::group(['prefix' => 'summary', 'as' => 'summary.'], function () {
+        Route::get('/count', [AggregateController::class, 'userSummary'])->name('count');
+        Route::get('/projects', [AggregateController::class, 'userProjects'])->name('projects');
+        Route::get('/tasks', [AggregateController::class, 'userTasks'])->name('tasks');
+    });
+
     Route::delete('/members/{project_id}/remove/{user_id}', [ProjectMemberController::class, 'removeDeveloper'])->name('members.remove');
-    Route::apiResource('/projects', ProjectController::class)->only('index', 'show', 'update');
+    Route::apiResource('projects', ProjectController::class)->only('index', 'show', 'update');
     Route::apiResources([
         'tasks' => TaskController::class,
         'members' => ProjectMemberController::class,
     ]);
 });
+
+Route::post('/login', [ApiAuthenticationController::class, 'store']);
 
 Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/user', function (Request $request) {
@@ -59,5 +68,3 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/logout', [ApiAuthenticationController::class, 'destroy']);
 });
 
-Route::post('/login', [ApiAuthenticationController::class, 'store']);
-Route::get('/projects', [ProjectController::class, 'paginateIndex']);
